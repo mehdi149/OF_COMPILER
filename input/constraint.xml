@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<constraints>
+
+  <constraint type="PERFORMANCE">  
+      <list_constraint> latency , bandwidth , queue </list_constraint>
+      
+  </constraint>
+  
+  <constraint type ="RESSOURCE">
+    <path_processing>
+       <table id=1 >
+        
+          <match_field> </match_field>
+          
+          <number_entry></number_entry>
+        
+        </table>
+        
+        <table id=2 >
+            <match_field> </match_field>
+            
+            <number_entry> </number_entry>
+          
+          </table>
+          
+            
+    </path_processing>
+      
+  </constraint>
+  
+
+</constraints>
