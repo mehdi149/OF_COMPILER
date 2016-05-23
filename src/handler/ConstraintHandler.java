@@ -1,0 +1,105 @@
+package handler;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Array;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+import struct.ConstraintType;
+import struct.Constraints;
+
+public class ConstraintHandler {
+	
+	public String ConstraintXML;
+	public HashMap<ConstraintType,HashMap<Constraints,Object>> MapConstraint;
+	public ConstraintHandler(String ConstraintXML){
+		 this.ConstraintXML=ConstraintXML;
+		
+	}
+	public void parse_ConstraintXML() throws ParserConfigurationException, SAXException, IOException{
+		  
+		  HashMap<Constraints,Object> constraints_map = new HashMap<Constraints,Object>();
+	      File inputFile = new File(this.ConstraintXML);
+	      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	      DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+	      Document doc = dBuilder.parse(inputFile);
+	      doc.getDocumentElement().normalize();
+	      System.out.println("Root element :" 
+	              + doc.getDocumentElement().getNodeName());
+	      List<Constraints> constraints = Arrays.asList(Constraints.values());
+	      System.out.println(constraints);
+	      for(int cpt=0 ; cpt<constraints.size();cpt++){
+	        NodeList nList = doc.getElementsByTagName(constraints.get(cpt).toString());
+	        for(int i=0;i<nList.getLength();i++){
+          	   Node node = nList.item(i);
+	    	   if(node.getNodeType() == Node.ELEMENT_NODE ){
+	    	     System.out.println(node);
+	    	     Element element = (Element) node;
+	    	     NodeList constraints_node = element.getElementsByTagName("constraint");
+	    	     for(int j=0;j<constraints_node.getLength();j++){
+	    	    	 if(constraints_node.item(j).getParentNode()== node ){
+	    	    	 Node constraint_node = constraints_node.item(j);
+	    	    	  if(constraint_node.getNodeType() == Node.ELEMENT_NODE ){
+	    	    	    Element element_constraint = (Element) constraint_node;
+	    	    	    // get Type constraint and referenced value
+	    	    	    System.out.println(element_constraint.getAttribute("type"));
+	    	    	     System.out.println(element_constraint.getTextContent().trim());
+	    	    	    NodeList constraints_value = element.getElementsByTagName(element_constraint.getTextContent().trim());
+	    	    	    
+	    	    	    for(int k=0;k<constraints_value.getLength();k++){
+	    	    	    Element node_const_val = (Element)constraints_value.item(k);
+	    	    	    if(node_const_val.getNodeType()== Node.ELEMENT_NODE){
+	    	    	      System.out.println("entreer");
+	    	    	      if(constraints.get(cpt).toString()==Constraints.path_processing.toString()){
+	    	    	    	  ArrayList<String>  tablesID= new ArrayList<String>();
+	    	    	    	  String tableid = ((Element)constraints_value.item(k)).getAttribute("id");
+	    	    	    	  System.out.println(tableid);
+	    	    	    	  tablesID.add(tableid);
+	    	    	    	  constraints_map.put(Constraints.path_processing,tablesID);
+	    	    	    	  
+	    	    	      }
+	    	    	      if(constraints.get(cpt).toString()==Constraints.table.toString()){
+	    	    	    	// matching field
+	    	    	    	// number entry
+	    	    	      }
+	    	    	      
+	    	    	    	
+	    	    	    }
+	    	    	   }
+	    	    	    
+	    	    	    constraints_map.put(Constraints.path_processing, element_constraint.getNodeValue());
+	    	    	    
+	    	    	    
+	    	    	  }
+	    	    	 }
+	    	     }
+	    	     
+	    	  }
+	      }
+	      }
+	      
+	        
+	      }		
+	
+	public void get_spec_from_profile(){
+		
+	}
+	
+	
+	
+
+}
