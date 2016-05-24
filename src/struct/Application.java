@@ -19,7 +19,7 @@ public class Application {
 	int id;
 	Map<Integer,Table> AppTable;
 	Map<Integer,SubsetTable> SubSetTable;
-	int[][] TableChaining;
+	public int[][] TableChaining;
 	public Application(int id, Map<Integer, Table> appTable,
 			Map<Integer, SubsetTable> subSetTable, int[][] tableChaining) {
 		super();
