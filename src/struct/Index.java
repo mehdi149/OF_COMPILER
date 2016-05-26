@@ -15,12 +15,10 @@ public class Index {
 	public ArrayList<Lat_Attribute> key;
 	// Rule Subset
 	public ArrayList<Lat_Object> ruleSubset;
-	public float prio;
 	public Index(int id) {
 		this.id = id;
 		key = new ArrayList<Lat_Attribute>();
 		ruleSubset = new ArrayList<Lat_Object>();
-		prio = 0;
 	}
 
 	@Override

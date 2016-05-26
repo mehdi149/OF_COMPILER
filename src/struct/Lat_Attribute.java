@@ -12,18 +12,17 @@ import java.io.Serializable;
 public class Lat_Attribute implements Serializable {
 
 	public int id;
-	public double priority;
+	
 	public AttributeType type;
 	public String value;
 	
 	//use only for int 
-	public int weight;
+	int weight;
 	public Lat_Attribute(int id) {
 		this.id = id;
 		type = null;
 		value = "";
 		weight = 0;
-		priority=0;
 	}
 
 	
