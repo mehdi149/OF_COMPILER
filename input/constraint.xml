@@ -3,15 +3,27 @@
 
     <path_processing constraint="True">
        <constraint type="RESSOURCE"> table </constraint>
-       <table id="1" constraint= "True">
-         <matchField> eth_dest</matchField>
+       <table id="0" constraint= "True">
+         <matchField> EtherSrc</matchField>
          <number_entry> 300</number_entry>
          <constraint type="RESSOURCE"> number_entry </constraint>
          <constraint type="PERFORMANCE"> matchField </constraint>
        </table>
-       <table id="2" constraint="True">
-        <matchField> ip_src</matchField>
+       <table id="1" constraint="True">
+        <matchField> IpSrc</matchField>
         <number_entry> 1000 </number_entry>
+        <constraint type="RESSOURCE"> number_entry </constraint>
+        <constraint type="PERFORMANCE"> matchField</constraint>
+       </table>
+       <table id="2" constraint="True">
+        <matchField> EtherType</matchField>
+        <number_entry> 50 </number_entry>
+        <constraint type="RESSOURCE"> number_entry </constraint>
+        <constraint type="PERFORMANCE"> matchField</constraint>
+       </table>
+       <table id="3" constraint="True">
+        <matchField> EtherDst</matchField>
+        <number_entry> 50 </number_entry>
         <constraint type="RESSOURCE"> number_entry </constraint>
         <constraint type="PERFORMANCE"> matchField</constraint>
        </table>
@@ -36,4 +48,3 @@
       
   </switch>
   
-

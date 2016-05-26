@@ -10,5 +10,6 @@ package struct;
  */
 public enum MatchType {
 	EXACT,
+	HASH,
 	LPM;
 }
