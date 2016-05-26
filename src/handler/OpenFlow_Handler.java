@@ -21,13 +21,11 @@ import org.openflow.protocol.action.OFActionOutput;
 import org.openflow.protocol.factory.BasicFactory;
 import org.openflow.util.LRULinkedHashMap;
 import org.openflow.util.U16;
-/**
- *
- * @author Mehdi Bahra
- *
- */
+
+
 public class OpenFlow_Handler {
-    public static void main(String[] args) {
+    public OpenFlow_Handler() {
+    	String[] args;
     	args = new String[3];
     	args[0]="localhost";
     	// Controller Port
