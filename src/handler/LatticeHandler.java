@@ -3,6 +3,7 @@ package handler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,6 +19,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import struct.AttributeType;
 import struct.Lat_Attribute;
 import struct.Lat_Concept;
 import struct.Lat_Object;
@@ -318,31 +320,25 @@ public class LatticeHandler {
 		
 	}
 	
-	public ArrayList<Lat_Concept> getSignificantConcept (Lattice lattice){
-		//System.out.println(lattice.concepts.;
+	public ArrayList<Lat_Concept> getSignificantConcept (Lattice lattice , Switch S){
+		
 		ArrayList<Lat_Concept> conceptCache = new ArrayList<Lat_Concept>();
 		
 		ArrayList<Object> objectStack = new ArrayList<Object>();
+		ArrayList<Object> objectStack2 = new ArrayList<Object>();
 		ArrayList<Lat_Concept> conceptStack = new ArrayList<Lat_Concept>();
 		
 		Map<Lat_Object, ArrayList<Lat_Concept>> baseConceptList = new LinkedHashMap<Lat_Object, ArrayList<Lat_Concept>>() ;
 			
 		// Recuperation des concepts du niveau N-1
 		Lat_Concept baseConcept = lattice.concepts.get(lattice.bottomConceptId);
-		//System.out.println(lattice.concepts.size());
 		for (int i=0; i<baseConcept.parents.size(); i++){
 			conceptCache.add( lattice.concepts.get(baseConcept.parents.get(i)) );
 		}
-		//System.out.println("concepts Cache");
-		for(int i=0 ;i<conceptCache.size();i++){
-			//System.out.println(conceptCache.get(i));
-			
-		}
+		
 		// Sort Concept per Object
-		//System.out.println("objects");
-		//System.out.println(lattice.objects);
 		for (Map.Entry<Integer,Lat_Object> o : lattice.objects.entrySet()){
-			//System.out.println(o);
+			
 			Lat_Object object = o.getValue();
 			ArrayList<Lat_Concept> conceptMatchList = new ArrayList<Lat_Concept>();
 			
@@ -350,15 +346,9 @@ public class LatticeHandler {
 				ArrayList<Lat_Object> conceptExtentList = conceptCache.get(i).extent;
 				if (conceptExtentList.contains(object)){
 					conceptMatchList.add(conceptCache.get(i));
-					
 				}
-				
-				
 			}
-			//System.out.println("concept match list");
-			//System.out.println(conceptMatchList);
-			/*for (int i =0 ; i<lattice.concepts.size()+1;i++){
-				System.out.println(lattice.concepts.get(i));}*/
+			
 			if ( !conceptMatchList.isEmpty() ) {
 				baseConceptList.put(object, conceptMatchList);
 			} else {
@@ -368,32 +358,55 @@ public class LatticeHandler {
 			
 		}
 		
-		/*for (Entry<Lat_Object, ArrayList<Lat_Concept>> bclist : baseConceptList.entrySet()){
-			bclist.getKey().toStringObject();
-			for (int i=0; i< bclist.getValue().size(); i++){
-				System.out.print( "\t" );
-				bclist.getValue().get(i).toStringConcept();
-			}
-		}*/
-		
 		// Recuperation des concepts pour la construction du Trie
-		
-		//System.out.println("baseConcept");
-		//System.out.println(baseConceptList.entrySet());
-		
 		for (Entry<Lat_Object, ArrayList<Lat_Concept>> bclist : baseConceptList.entrySet()){
 			Lat_Object object = bclist.getKey();
-			//System.out.println(bclist);
-			if (!objectStack.contains(object)){
 
+			if (!objectStack.contains(object) ){
 				int nbConcept = bclist.getValue().size();
-				if ( nbConcept < 2 ){
+				//System.out.println(nbConcept);
+				if ( nbConcept < 2){
 					Lat_Concept concept = bclist.getValue().get(0);
+					
 					if (!conceptStack.contains(concept))
-						conceptStack.add(concept);
+					{
+						ArrayList<AttributeType> Cache_Concept = new ArrayList<AttributeType>();
+						ArrayList<AttributeType> Cache_Path = new ArrayList<AttributeType>();
+						System.out.println("===========");
+						for (int i= 0; i<concept.generators.size(); i++){
+							Cache_Concept.add(concept.generators.get(i).type);
+							for (int j=0; j<S.path_processing.size(); j++){
+								Cache_Path.add(S.path_processing.get(j).matchField);						
+								}}
+						if(Cache_Path.containsAll(Cache_Concept))
+							conceptStack.add(concept);
+					
+						
+						/*Lat_Concept fav_cache = new Lat_Concept(concept.id,concept.support,concept.level,
+								concept.type, concept.extent, concept.intent, concept.parents,
+								concept.children);
+						fav_cache.generators.clear();
+						//System.out.println(concept);
+						for (int i= 0; i<concept.generators.size(); i++){
+							System.out.println(concept.generators.get(i).type);
+							for (int j=0; j<S.path_processing.size(); j++){
+								if(concept.generators.get(i).type.equals(S.path_processing.get(j).matchField)){
+									fav_cache.generators.add(concept.generators.get(i));
+									System.out.println(concept.generators.get(i));
+									}
+								
+								}	
+						}*/
+						
+					}
 					for (int i=0; i<concept.extent.size(); i++){
 						if (!objectStack.contains(concept.extent.get(i))){
 							objectStack.add(concept.extent.get(i));
+						}
+					}
+					for (int i=0; i<concept.generators.size(); i++){
+						if (!objectStack2.contains(concept.generators.get(i))){
+							objectStack2.add(concept.generators.get(i));
 						}
 					}
 				} else {
@@ -418,29 +431,54 @@ public class LatticeHandler {
 							if (rolist.getValue() > max){
 								max = rolist.getValue();
 								favouriteConcept = rolist.getKey();
+										   
 							}
 						}
 					}
+					ArrayList<AttributeType> Cache_Concept = new ArrayList<AttributeType>();
+					ArrayList<AttributeType> Cache_Path = new ArrayList<AttributeType>();
+					System.out.println("===========");
+					for (int i= 0; i<favouriteConcept.generators.size(); i++){
+						Cache_Concept.add(favouriteConcept.generators.get(i).type);
+						for (int j=0; j<S.path_processing.size(); j++){
+							Cache_Path.add(S.path_processing.get(j).matchField);	
+							}}
+					if(Cache_Path.containsAll(Cache_Concept))
+						conceptStack.add(favouriteConcept);
+				
+					//System.out.println("lflflf");
+					/*Lat_Concept fav_cache = new Lat_Concept(favouriteConcept.id,favouriteConcept.support,favouriteConcept.level,
+							favouriteConcept.type, favouriteConcept.extent, favouriteConcept.intent, favouriteConcept.parents,
+							favouriteConcept.children);
+					fav_cache.generators.clear();
+					//System.out.println(favouriteConcept.generators);
+					for (int i= 0; i<favouriteConcept.generators.size(); i++){
+						for (int j=0; j<S.path_processing.size(); j++){
+							if(favouriteConcept.generators.get(i).type.equals(S.path_processing.get(j).matchField)){
+										fav_cache.generators.add(favouriteConcept.generators.get(i));	
+										//System.out.println(fav_cache);
+									}
+							
+							}
+						}*/
 					
-					conceptStack.add(favouriteConcept);
+							//System.out.println(favouriteConcept.generators.get(i));
+					
 					for (int i=0; i<favouriteConcept.extent.size(); i++){
 						if (!objectStack.contains(favouriteConcept.extent.get(i))){
 							objectStack.add(favouriteConcept.extent.get(i));
 						}
 					}
-					
+					for (int i=0; i<favouriteConcept.generators.size(); i++){
+						if (!objectStack2.contains(favouriteConcept.generators.get(i))){
+							objectStack2.add(favouriteConcept.generators.get(i));
+						}
+					}
 				}
 				
 			}
 		}
-		
-		/*for (int i =0 ; i<lattice.concepts.size()+1;i++){
-		System.out.println(lattice.concepts.get(i));}
-		
-		System.out.println("");
-		for (int i=0;i<conceptStack.size();i++){
-			System.out.println(conceptStack.get(i));
-		}*/
+		//System.out.println(conceptStack);
 		return conceptStack;
 		
 	}

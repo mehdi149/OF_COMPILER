@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.python.modules.time.Time;
 
 import struct.*;
 
@@ -61,7 +60,7 @@ public class Compiler {
 				OpenFlow_Handler openFlow_handler = new OpenFlow_Handler();
 			}
 		 }.start();
-		 Time.sleep(5.0);
+		 Thread.sleep(5000);
 		
 
 		/********* Temporary files**************/
@@ -95,10 +94,14 @@ public class Compiler {
 		ruleList = rulehander.GetRulesFromRCF(inputFilenameRCF);
 		
 		
-		
+
+		Switch S = new Switch();
+		ConstraintHandler C = new ConstraintHandler("input/constraint.xml");
+		C.parse_ConstraintXML();
+		S.getConstraint(C.MapConstraint);
 		
 		/** Extract significant concept from the set of all concepts **/
-		ArrayList<Lat_Concept> favoriteConceptList = latticeHandler.getSignificantConcept(lattice);
+		ArrayList<Lat_Concept> favoriteConceptList = latticeHandler.getSignificantConcept(lattice, S);
 		/** Generate Indexes **/
 		TrieHandler trieHandler = new TrieHandler();
 		ArrayList<Index> indexList = trieHandler.generateIndex(favoriteConceptList);
@@ -108,15 +111,17 @@ public class Compiler {
 		}
 		/**************** Generate Pipelines **************/
 		EntryHandler entryHandler = new EntryHandler();
-		ArrayList<Pipeline> pipelines= entryHandler.generateIndexPipeline(indexList); 
-		Application app = entryHandler.appGenerator(lattice, indexList, ruleList);
+		ArrayList<Pipeline> pipelines= entryHandler.generateIndexPipeline(indexList, S); 
+		ArrayList<Pipeline> p = entryHandler.SortPipeline(pipelines, S);
+		Application app = entryHandler.appGenerator(lattice, indexList, ruleList,p);
 		ArrayList<Table> tables = new ArrayList<Table>(app.getAppTable().values());
-		System.out.println(app);
+		System.out.println("/////////////////////||||||||||||||\\\\\\\\\\\\\\\\\\");
+		System.out.println(pipelines);
 		/*ClassificationValidator validator = new ClassificationValidator(pipelines,"/input/ovs.xml",tables);
 		validator.total_flows_analysis();*/
 		 ApplicationHandler app_handler = new ApplicationHandler(app);
 		 app_handler.deliver_pipeline_to_switch();
-		System.out.println(pipelines);
+		System.out.println(p);
 		
 		/** Update of lattice 
 		 * First we generate a temporary lattice

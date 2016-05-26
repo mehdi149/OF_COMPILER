@@ -27,6 +27,7 @@ import org.projectfloodlight.openflow.protocol.action.OFAction;
 import org.projectfloodlight.openflow.protocol.action.OFActions;
 import org.projectfloodlight.openflow.protocol.instruction.OFInstruction;
 import org.projectfloodlight.openflow.protocol.instruction.OFInstructionApplyActions;
+import org.projectfloodlight.openflow.protocol.instruction.OFInstructionGotoTable;
 import org.projectfloodlight.openflow.protocol.instruction.OFInstructions;
 import org.projectfloodlight.openflow.protocol.match.Match;
 import org.projectfloodlight.openflow.protocol.match.Match.Builder;
@@ -64,16 +65,18 @@ public class ApplicationHandler {
 		return match;
 	}
 	public void add_flow (int table_id ,Match myMatch ,List<OFInstruction> myInstructionLists,ArrayList<OFAction> myActionList) throws IOException{
-        
+        if(myActionList.size()!=0){
         OFInstructions instructions = my13Factory.instructions();
         OFInstructionApplyActions applyActions = instructions.buildApplyActions()
         	    .setActions(myActionList)
         	    .build();
+        myInstructionLists.addAll(ImmutableList.<OFInstruction> of(
+                applyActions));
+        }
         OFFlowAdd flowAdd = my13Factory.buildFlowAdd()
                  .setBufferId(OFBufferId.NO_BUFFER)
                  .setMatch(myMatch)
-                 .setInstructions(ImmutableList.<OFInstruction> of(
-                         applyActions))
+                 .setInstructions(myInstructionLists)
                  .setOutPort(OFPort.CONTROLLER)
                  .setTableId(TableId.of(table_id))
                .build();
@@ -188,21 +191,23 @@ public class ApplicationHandler {
 			for (int k=0 ; k< entries.size();k++){
 				Entry  entry= entries.get(k);
 				String lat_attribute = entry.matchfield.toString(); 
+				String action = entry.action;
+			    int next_table_id = entry.nextTableId;
+				System.out.println(action);
+				System.out.println(next_table_id);
 				// parse matchfield and create Ofmatch
 				String Field = Arrays.asList(lat_attribute.split("\\=")).get(0);
 				Field = Field.replace("[", "");
 				String Value = Arrays.asList(lat_attribute.split("\\=")).get(1);
 				Value = Value.replace("]","");
 				System.out.println(Field);
-				System.out.println(Value);
-				
-				
+				System.out.println(Value);	
 			     
 				Builder buildMatch = my13Factory.buildMatch();
-				Match match;
+				Match match = null;
 				switch(Field){
 				case "EtherType":
-					
+					 match = buildMatch.setExact(MatchField.ETH_TYPE, EthType.of(Integer.parseInt(Value))).build();
 					break;
 				case "EtherSrc":
 				      match = buildMatch.setExact(MatchField.ETH_SRC, MacAddress.of(Value)).build();
@@ -231,9 +236,15 @@ public class ApplicationHandler {
 					break;
 				
 				}
-				
-				
+				System.out.println();
+				 OFActions actions_subset = my13Factory.actions();
+			     OFInstructionGotoTable instructions = my13Factory.instructions().gotoTable(TableId.of(next_table_id));
+			     List<OFInstruction> listInstruction =ImmutableList.<OFInstruction> of(
+                         instructions);
+			     add_flow(id_table,match,listInstruction,new ArrayList<OFAction>());
+				 				
 			}
+			
 			
 		}
 
