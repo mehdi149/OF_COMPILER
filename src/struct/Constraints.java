@@ -1,12 +1,11 @@
 package struct;
 
 public enum Constraints {
-	path_processing,
-	matching,
-	latency,
-	table,
-	bandwidth,
-	number_entry,
+	PATH_PROCESSING,
+	Matching,
+	Latency,
+	Table,
+	Number_Entry,
 	
 
 }

@@ -49,10 +49,7 @@ public class Compiler {
 		String tmpTrie = ofcompilerpath + "tmp/" + args[4];
 		String adressedufichier = ofcompilerpath + "output/"+ args[4] +".json";
 	
-		ConstraintHandler constraint_handler = new ConstraintHandler("input/constraint.xml");
-		constraint_handler.parse_ConstraintXML();
-		System.out.println("#################MAP CONSTRAINT########################");
-		System.out.println(constraint_handler.MapConstraint);
+			
 
 		/********* Temporary files**************/
 		int LatticeId = 0;
@@ -101,10 +98,8 @@ public class Compiler {
 		ArrayList<Pipeline> pipelines= entryHandler.generateIndexPipeline(indexList); 
 		Application app = entryHandler.appGenerator(lattice, indexList, ruleList);
 		ArrayList<Table> tables = new ArrayList<Table>(app.getAppTable().values());
-		/*ClassificationValidator validator = new ClassificationValidator(pipelines,"/input/ovs.xml",tables);
-		validator.total_flows_analysis();*/
-		ApplicationHandler app_handler = new ApplicationHandler(app);
-		app_handler.deliver_pipeline_to_switch();
+		ClassificationValidator validator = new ClassificationValidator(pipelines,"/input/ovs.xml",tables);
+		validator.total_flows_analysis();
 		
 		/** Update of lattice 
 		 * First we generate a temporary lattice
