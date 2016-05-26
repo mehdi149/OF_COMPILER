@@ -45,7 +45,7 @@ public class EntryHandler {
 			for (int j=0; j<indexList.get(i).key.size(); j++){
 				attrIndexCache.add(indexList.get(i).key.get(j));
 			}
-			SubsetTable subsetTable = new SubsetTable (i+1000);
+			SubsetTable subsetTable = new SubsetTable (i+100);
 			// Recuperer les attributs pour completer la regle
 			ArrayList<AttributeType> fieldTypeStack = new ArrayList<AttributeType>();
 			ArrayList<Lat_Object> ruleSubset = indexList.get(i).ruleSubset;
@@ -115,7 +115,7 @@ public class EntryHandler {
 					out_metadata = index.id;
 				}
 				else {
-					tempId = index.id+1000; 
+					tempId = index.id+100; 
 					action = "GO_TO_SUBTABLE";
 				} 
 				  if(j!=0) in_metadata = index.id;				  
@@ -139,7 +139,7 @@ public class EntryHandler {
 	 */
 	public int[][] generateMatrix(ArrayList<Pipeline> pipelineList){
 		int[][] matrixTabTab = new int[32][32];
-		int[][] matrixTabSub = new int[32][10000];
+		int[][] matrixTabSub = new int[32][100];
 		Set<Integer> setTab = new HashSet<Integer>() ;
 		Set<Integer> setSub = new HashSet<Integer>() ;
 		Iterator<Pipeline> pipeIter = pipelineList.iterator();
@@ -157,7 +157,7 @@ public class EntryHandler {
 						setTab.add(entry.nextTableId);
 					}
 					if(action == "GO_TO_SUBTABLE"){
-						matrixTabSub[table.id][entry.nextTableId-1000]=1;
+						matrixTabSub[table.id][entry.nextTableId-100]=1;
 						setTab.add(table.id);
 						setSub.add(entry.nextTableId);
 					}
