@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.python.modules.time.Time;
-
 import struct.*;
 
 /**
@@ -40,7 +38,7 @@ import struct.*;
 public class Compiler {
 	public static void main(String[] args) throws Exception  {
 		//Input Params for the program
-		String [] s = "-compile input/test2.rcf input/test_up.rcf 2 serial".split(" ");
+		String [] s = "-compile input/test.rcf input/test_up.rcf 2 serial".split(" ");
 		args = s;
 		String cmdline = args[0];
 		String inputFilenameRCF = args[1];
@@ -52,17 +50,9 @@ public class Compiler {
 		String adressedufichier = ofcompilerpath + "output/"+ args[4] +".json";
 	
 		ConstraintHandler constraint_handler = new ConstraintHandler("input/constraint.xml");
-		
 		constraint_handler.parse_ConstraintXML();
 		System.out.println("#################MAP CONSTRAINT########################");
 		System.out.println(constraint_handler.MapConstraint);
-		 new Thread() {
-			public void run(){
-				OpenFlow_Handler openFlow_handler = new OpenFlow_Handler();
-			}
-		 }.start();
-		 Time.sleep(5.0);
-		
 
 		/********* Temporary files**************/
 		int LatticeId = 0;
@@ -111,12 +101,10 @@ public class Compiler {
 		ArrayList<Pipeline> pipelines= entryHandler.generateIndexPipeline(indexList); 
 		Application app = entryHandler.appGenerator(lattice, indexList, ruleList);
 		ArrayList<Table> tables = new ArrayList<Table>(app.getAppTable().values());
-		System.out.println(app);
 		/*ClassificationValidator validator = new ClassificationValidator(pipelines,"/input/ovs.xml",tables);
 		validator.total_flows_analysis();*/
-		 ApplicationHandler app_handler = new ApplicationHandler(app);
-		 app_handler.deliver_pipeline_to_switch();
-		System.out.println(pipelines);
+		ApplicationHandler app_handler = new ApplicationHandler(app);
+		app_handler.deliver_pipeline_to_switch();
 		
 		/** Update of lattice 
 		 * First we generate a temporary lattice
@@ -194,7 +182,7 @@ public class Compiler {
 		}
 		
 		String trieToText = trie.formatTrieJson(trie.root);//trie.formatTrie(trie.root);
-		//System.out.println(trieToText);
+		System.out.println(trieToText);
 		try
 		{
 			FileWriter fw = new FileWriter(adressedufichier, false);

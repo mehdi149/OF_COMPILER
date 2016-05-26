@@ -197,7 +197,7 @@ public class RuleHandler {
 			Rule rule = new Rule(j, nameRule[j]);
 			String[] rulemap = file.nextLine().split(" ");
 			int attNumber = 0;
-			for(int i=0;i<rulemap.length-1;i++){
+			for(int i=0;i<rulemap.length;i++){
 				if(Integer.parseInt(rulemap[i])==0) continue;
 				
 				String[] attribute = ObjList[i].split("=");

@@ -1,6 +1,4 @@
 package handler;
-import io.netty.buffer.ByteBuf;
-import static io.netty.buffer.Unpooled.*;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.net.*;
@@ -9,23 +7,11 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import net.floodlightcontroller.packetstreamer.thrift.Message;
-
-import org.projectfloodlight.openflow.exceptions.OFParseError;
-import org.projectfloodlight.openflow.protocol.OFFactories;
-import org.projectfloodlight.openflow.protocol.OFFactory;
-import org.projectfloodlight.openflow.protocol.OFMessage;
-import org.projectfloodlight.openflow.protocol.OFMessageReader;
-import org.projectfloodlight.openflow.protocol.OFVersion;
-
-import org.apache.thrift.protocol.TProtocol;
 import org.openflow.io.OFMessageAsyncStream;
 import org.openflow.protocol.OFEchoReply;
 import org.openflow.protocol.OFFlowMod;
 import org.openflow.protocol.OFMatch;
-import org.openflow.protocol.OFEchoRequest;
-//import org.openflow.protocol.OFMessage;
+import org.openflow.protocol.OFMessage;
 import org.openflow.protocol.OFPacketIn;
 import org.openflow.protocol.OFPacketOut;
 import org.openflow.protocol.OFPort;
@@ -38,9 +24,7 @@ import org.openflow.util.U16;
 
 
 public class OpenFlow_Handler {
-	public static ThreadSockets thread_sockets;
     public OpenFlow_Handler() {
-    	
     	String[] args;
     	args = new String[3];
     	args[0]="localhost";
@@ -59,7 +43,7 @@ public class OpenFlow_Handler {
                     + " on port " + localport);
             ServerSocket server = new ServerSocket(localport);
             while (true) {
-                thread_sockets = new ThreadSockets(server.accept(), host, remoteport);
+                new ThreadSockets(server.accept(), host, remoteport);
             }
         } catch (Exception e) {
             System.err.println(e);
@@ -68,8 +52,7 @@ public class OpenFlow_Handler {
 }
 
 class ThreadSockets extends Thread {
-    public  Socket sClient;
-    public OutputStream outToClient;
+    private Socket sClient;
     private final String SERVER_URL;
     private final int SERVER_PORT;
     public static PrintWriter writerRcf;
@@ -90,8 +73,7 @@ class ThreadSockets extends Thread {
     public static void OFHandler(List<OFMessage> msgs) throws IOException{
         for (OFMessage msg : msgs){
         	System.out.println(msgs.size());
-        	
-        	/*if( msg.getType() == OFType.FLOW_MOD){
+        	if( msg.getType() == OFType.FLOW_MOD){
         		// get of flow mod rule and add it to rcf 
         		System.out.println("of flow mod");
         		OFFlowMod flow_mod_msg = (OFFlowMod)msg;
@@ -187,7 +169,7 @@ class ThreadSockets extends Thread {
         		}
         		//Close the input stream
         		br.close(); 
-        		}*/
+        		}
         		
         	
         		
@@ -222,13 +204,12 @@ class ThreadSockets extends Thread {
     	
     	
     }
-    
     public void run() {
         try {
             final byte[] request = new byte[1024];
             byte[] reply = new byte[4096];
             final InputStream inFromClient = sClient.getInputStream();
-            this.outToClient = sClient.getOutputStream();
+            final OutputStream outToClient = sClient.getOutputStream();
             Socket client = null, server = null;
             // connects a socket to the server
             try {
@@ -277,19 +258,9 @@ class ThreadSockets extends Thread {
                 while ((bytes_read = inFromServer.read(reply)) != -1) {
                     outToClient.write(reply, 0, bytes_read);
                     outToClient.flush();
-                   /* ByteBuffer bb = ByteBuffer.wrap(reply,0,bytes_read);
-                    bb.order(ByteOrder.BIG_ENDIAN);*/
-                    OFFactory my13Factory = OFFactories.getFactory(OFVersion.OF_13);
-                    OFMessageReader<OFMessage> reader= OFFactories.getGenericReader();
-                    System.out.println(bytes_read);
-                    ByteBuf byte_buf = wrappedBuffer(reply,0,bytes_read);
-                    byte_buf.order(ByteOrder.BIG_ENDIAN);
-                    System.out.println(bytes_read);
-                    
-                    OFMessage message =  reader.readFrom(byte_buf);
-                    System.out.println(message);
-                    System.out.println(message.getClass().getName());
-                    /*BasicFactory factory = new BasicFactory();
+                    ByteBuffer bb = ByteBuffer.wrap(reply,0,bytes_read);
+                    bb.order(ByteOrder.BIG_ENDIAN);
+                    BasicFactory factory = new BasicFactory();
                     final List<OFMessage> msgs = factory.parseMessages(bb);
                     System.out.println(msgs);
                     // get of flow Mod packet type and store it to rcf file 
@@ -298,15 +269,12 @@ class ThreadSockets extends Thread {
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					}}}.start();*/
+					}}}.start();
                     }        
                 
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (OFParseError e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} finally {
+            } finally {
                 try {
                     if (server != null)
                         server.close();
