@@ -13,15 +13,15 @@ public class Table {
 	public int id;	
 	public MatchType matchType;
 	public AttributeType matchField;
+
+	
 	public ArrayList<Entry> entry;
-	public int number_entry;
 	
 	public Table (int id, AttributeType matchField){
 		this.id = id;
 		matchType = null;
 		this.matchField = matchField;		
 		entry = new ArrayList<Entry>();
-		this.number_entry = 100;
 
 	}
 	public Table(int id,AttributeType matchField, MatchType matchType){
@@ -29,25 +29,21 @@ public class Table {
 		this.matchType = matchType;
 		this.matchField = matchField;		
 		entry = new ArrayList<Entry>();
-		this.number_entry = 100;
 
 	}
 	
 	public void setTableMatchType(AttributeType matchField){
-		//System.out.println("created");
 		matchType = MatchType.EXACT;
 		if ( matchField.equals(AttributeType.IpDst) | matchField.equals(AttributeType.IpSrc)){
 			matchType = MatchType.LPM;
 		}
-		if ( matchField.equals(AttributeType.EtherDst) | matchField.equals(AttributeType.EtherSrc)){
-			matchType = MatchType.HASH;
-		}
+		
 	}
 	@Override
 	public String toString(){
 		//if(this == null) return "Table is null";
 		String string="";
-		string ="Table id is "+id+" Match Type is "+matchType+" Matchfield is "+matchField+ "nbr entree "+ number_entry+"\n";
+		string ="Table id is "+id+" Match Type is "+matchType+" Matchfield is "+matchField+"\n";
 		java.util.Iterator<Entry> iter = entry.iterator();
 		while(iter.hasNext()){
 			string += iter.next().toString()+"\n";
