@@ -2,3 +2,9 @@
 Default Name
 [Binary Relation]
 Default Name
+R0 | R1 | 
+in_port=2 |  eth_dst=d6:e4:e7:a4:82:6a | in_port=1 | eth_dst=a6:9d:61:4b:31:09
+1 1 0 0 
+0 0 1 1 
+
+[END Relational Context]

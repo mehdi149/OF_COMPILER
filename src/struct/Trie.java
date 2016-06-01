@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.lang.Math;
 
 	/**
 	 * @author root
@@ -103,15 +104,23 @@ public class Trie implements Serializable {
 	public Lat_Attribute FindMaxAttr(ArrayList<Lat_Attribute> list_attr){
 		int res =0;
 		int max=0;
+		double min_priority=10;
 		
 		for(int j=0;j<list_attr.size();j++){
-			if(list_attr.get(j).weight>max){
+			if(list_attr.get(j).weight>max ){
 				max=list_attr.get(j).weight;
-				res=j;
+				//System.out.println("/////....");
+				if (list_attr.get(j).priority<min_priority){
+				  min_priority = list_attr.get(j).priority;
+				  //System.out.println(list_attr.get(j).priority + list_attr.get(j).priority+".......");
+				  res=j;
+				}
+				
 			}
 		}
 		return list_attr.get(res);
 	}	
+	/*	
 	/**
 	 * 
 	 * @param indexList
@@ -121,6 +130,7 @@ public class Trie implements Serializable {
 	public Index FindMaxIndex(ArrayList<Index> indexList){
 		int res=0;
 		int max=0;
+		//System.out.println("ppppppppppppppppp");
 		for(int j=0;j<indexList.size();j++){
 			if(FindMaxAttr(indexList.get(j).key).weight>max){
 				max=FindMaxAttr(indexList.get(j).key).weight;
@@ -169,6 +179,21 @@ public class Trie implements Serializable {
 		 Index idx = indexList.get(2);
 		 indexList.add(idx);
 	    }
+	 
+	public static double ComputePriority(int weight, String str)
+		{
+			double result =  0;
+			if(str.equals("LPM")){
+				//System.out.println("LPM");
+				result = weight*70/(float)100 + 30/(float)300;}
+			if(str.equals("HASH")){
+				//System.out.println("HASH");
+				result = weight*70/(float)100 + 30/(float)200;}
+			if(str.equals("EXACT")){ 
+				//System.out.println("EXACCT");
+				result = weight*70/(float)100 + 30/(float)100;}
+			return result;
+		}
 	 /**
 	  * 
 	  * @param indexList
@@ -177,29 +202,21 @@ public class Trie implements Serializable {
 	public void CreateTrie(ArrayList<Index> indexList){
 		//editIndexList(indexList);
 		// fix weight problem and use it as base
-		for(int i=0;i<indexList.size();i++){
-			for(int j=i;j<indexList.size();j++){
-				Index index1 = indexList.get(i);
-				Index index2 = indexList.get(j);
-				for(int e=0;e<index1.key.size();e++){					
-					for(int f=0;f<index2.key.size();f++){
-						if(index1.key.get(e).equals(index2.key.get(f))){
-							index1.key.get(e).weight++;
-						}
-							
-					}
-				}
-			}
-		}
 		
 		
 		
 		HashMap<Integer, ArrayList<Index>> index_level = new HashMap<Integer, ArrayList<Index>>();
 		java.util.Iterator<Index> iterindex = indexList.iterator();
+		int cptt = 0;
+		//System.out.println(indexList.size());
 		while(iterindex.hasNext()){
+			cptt++;
+			
 			Index index = iterindex.next();
+			//Lat_Attribute e = new Lat_Attribute(9);
+			//index.key.add(e);
 			int num_fields = index.key.size();
-			//System.out.println(num_fields);
+			//System.out.println(index.key.size());			
 			if(index_level.containsKey(num_fields)){
 				index_level.get(num_fields).add(index);
 			}
@@ -213,15 +230,20 @@ public class Trie implements Serializable {
 				Node node_tmp = new Node(true, index.key.get(0), tempNodeList, this.root,1);
 				node_tmp.ruleSubset.addAll(index.ruleSubset);
 				this.root.childs.add(node_tmp);
+				
 			}
+			
 		}
+		
 		for(int i=0;i<index_level.size()-1;i++){
 		//for(int i=0;i<1;i++){
 			//in i=0; we will retrieve the level 2.
 			// the first level is already added so we need to start from level 2.
+			//System.out.println("pppp");
 			ArrayList<Index> current_level = index_level.get(i+2);
 			int til = current_level.size();
 			for(int j=0;j<til;j++){
+				
 				Index index = FindMaxIndex(current_level);
 				Node node = new Node();
 				//node.parent = new Node();
@@ -450,7 +472,7 @@ public class Trie implements Serializable {
 			s+=pad+"\"text\":{\"name\":\"\"},\n";
 		} else {
 			s+=pad+"{\n";
-			s+=pad+"\"text\":{\"name\":\""+ node.key.type +"="+ node.key.value +"\"},\n";
+			s+=pad+"\"text\":{\"name\":\""+ node.key.type +"="+ node.key.value + "??"+ node.key.priority +"\"},\n";
 		}
 		s+=pad+"\"children\":[\n";
 		if (node.leaf == true) {

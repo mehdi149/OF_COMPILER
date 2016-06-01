@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -319,30 +318,23 @@ public class LatticeHandler {
 	}
 	
 	public ArrayList<Lat_Concept> getSignificantConcept (Lattice lattice){
-		//System.out.println(lattice.concepts.;
+		
 		ArrayList<Lat_Concept> conceptCache = new ArrayList<Lat_Concept>();
 		
 		ArrayList<Object> objectStack = new ArrayList<Object>();
 		ArrayList<Lat_Concept> conceptStack = new ArrayList<Lat_Concept>();
 		
-		Map<Lat_Object, ArrayList<Lat_Concept>> baseConceptList = new LinkedHashMap<Lat_Object, ArrayList<Lat_Concept>>() ;
+		Map<Lat_Object, ArrayList<Lat_Concept>> baseConceptList = new HashMap<Lat_Object, ArrayList<Lat_Concept>>() ;
 			
 		// Recuperation des concepts du niveau N-1
 		Lat_Concept baseConcept = lattice.concepts.get(lattice.bottomConceptId);
-		//System.out.println(lattice.concepts.size());
 		for (int i=0; i<baseConcept.parents.size(); i++){
 			conceptCache.add( lattice.concepts.get(baseConcept.parents.get(i)) );
 		}
-		//System.out.println("concepts Cache");
-		for(int i=0 ;i<conceptCache.size();i++){
-			//System.out.println(conceptCache.get(i));
-			
-		}
+		
 		// Sort Concept per Object
-		//System.out.println("objects");
-		//System.out.println(lattice.objects);
 		for (Map.Entry<Integer,Lat_Object> o : lattice.objects.entrySet()){
-			//System.out.println(o);
+			
 			Lat_Object object = o.getValue();
 			ArrayList<Lat_Concept> conceptMatchList = new ArrayList<Lat_Concept>();
 			
@@ -350,15 +342,9 @@ public class LatticeHandler {
 				ArrayList<Lat_Object> conceptExtentList = conceptCache.get(i).extent;
 				if (conceptExtentList.contains(object)){
 					conceptMatchList.add(conceptCache.get(i));
-					
 				}
-				
-				
 			}
-			//System.out.println("concept match list");
-			//System.out.println(conceptMatchList);
-			/*for (int i =0 ; i<lattice.concepts.size()+1;i++){
-				System.out.println(lattice.concepts.get(i));}*/
+			
 			if ( !conceptMatchList.isEmpty() ) {
 				baseConceptList.put(object, conceptMatchList);
 			} else {
@@ -377,13 +363,8 @@ public class LatticeHandler {
 		}*/
 		
 		// Recuperation des concepts pour la construction du Trie
-		
-		//System.out.println("baseConcept");
-		//System.out.println(baseConceptList.entrySet());
-		
 		for (Entry<Lat_Object, ArrayList<Lat_Concept>> bclist : baseConceptList.entrySet()){
 			Lat_Object object = bclist.getKey();
-			//System.out.println(bclist);
 			if (!objectStack.contains(object)){
 
 				int nbConcept = bclist.getValue().size();
@@ -399,7 +380,7 @@ public class LatticeHandler {
 				} else {
 					
 					// Calculer le nombre de regles manquantes
-					Map<Lat_Concept, Integer> nbRequiredObjectList = new LinkedHashMap<Lat_Concept, Integer>() ;
+					Map<Lat_Concept, Integer> nbRequiredObjectList = new HashMap<Lat_Concept, Integer>() ;
 					for (int i=0; i<bclist.getValue().size(); i++){
 						Lat_Concept thisConcept = bclist.getValue().get(i);
 						int nbRequiredObject = 0;
@@ -434,13 +415,6 @@ public class LatticeHandler {
 			}
 		}
 		
-		/*for (int i =0 ; i<lattice.concepts.size()+1;i++){
-		System.out.println(lattice.concepts.get(i));}
-		
-		System.out.println("");
-		for (int i=0;i<conceptStack.size();i++){
-			System.out.println(conceptStack.get(i));
-		}*/
 		return conceptStack;
 		
 	}
